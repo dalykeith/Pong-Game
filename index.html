@@ -1,24 +1,42 @@
 <!DOCTYPE html>
+<!--
+Author: Keith Daly
+ID: G00315960
+Graphics Programming GMIT 2017
+Lab1
+-->
 <html>
- <head>
 
- <style type="text/css">
- 
- </style>
- </head>
+<body>
+<div align="center"><h1>Pong Game</h1></div>
+<canvas id="projectPong" width="800" height="600"></canvas>
+<script>
+var canvas;
+var canvasCtx;
+var ballX = 50;
 
- <body>
-    <canvas id="projectPong" width = "800" height = "600" ></canvas> 
+window.onload = function() {
+	console.log("xyz");
+	canvas = document.getElementById('projectPong');
+	canvasCtx = canvas.getContext('2d');
 
- <script type="text/javascript">
- var canvas;
- var canvasContent;
+    var framesPerSecond = 30;
+    setInterval(draw, 1000/framesPerSecond);
+	
+}
 
- window.onload = function(){
-     console.log("xyz");
-     canvas = document.getElementById();
- }
- </script>
- 
- </body>
+function draw(){
+    ballX = ballX + 5;
+    //console.log(ballX);
+    canvasCtx.fillStyle = 'black';
+	canvasCtx.fillRect(0,0,canvas.width,canvas.height);
+	canvasCtx.fillStyle = 'white';
+	canvasCtx.fillRect(0,100,10,200);
+	canvasCtx.fillStyle = 'red';
+	canvasCtx.fillRect(ballX,100,10,10);
+
+}
+
+</script>
+</body>
 </html>
