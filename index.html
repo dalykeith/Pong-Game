@@ -3,40 +3,112 @@
 Author: Keith Daly
 ID: G00315960
 Graphics Programming GMIT 2017
-Lab1
 -->
 <html>
 
+<!-- Game Presets to change
+
+Beginer mode:
+Please change ballSpeed X & Y
+and change
+colorRect(0,210,10,200,'white');
+
+Intermediate mode:
+Please change ballSpeed X & Y
+and change
+colorRect(0,210,10,100,'white');
+
+Advanced Mode:
+Please change ballSpeed X & Y
+and change
+colorRect(0,210,10,50,'white');
+
+-->
+
 <body>
-<div align="center"><h1>Pong Game</h1></div>
+    <canvas id="titleInfo" width="800" height="70"style="border:1px solid #d3d3d3;"></canvas>
+    <script>
+    var c = document.getElementById("titleInfo");
+    var ctx = c.getContext("2d");
+    ctx.font = "20px Georgia";
+    ctx.fillText("Pong Game", 25, 40);
+    ctx.fillText("User vs CPU", 650, 40);
+    </script>
+
 <canvas id="projectPong" width="800" height="600"></canvas>
 <script>
 var canvas;
 var canvasCtx;
 var ballX = 50;
+var ballY = 50;
+
+
+//Ball Speed (Mode:)
+// var ballSpeedX = 5;
+var ballSpeedX = 12;
+// var ballSpeedX = 25;
+
+// var ballSpeedXY = 1.5;
+var ballSpeedY = 4;
+// var ballSpeedY = 8;
 
 window.onload = function() {
-	console.log("xyz");
+	// console.log("test");
 	canvas = document.getElementById('projectPong');
 	canvasCtx = canvas.getContext('2d');
 
     var framesPerSecond = 30;
-    setInterval(draw, 1000/framesPerSecond);
+    setInterval(callBF, 1000/framesPerSecond);
 	
+}
+function callBF(){ //calls both functions
+    draw(); 
+    movement();
+}
+
+function movement(){
+        ballX = ballX + ballSpeedX;
+        ballY = ballY + ballSpeedY;
+        if(ballX < 0){
+            ballSpeedX = - ballSpeedX;
+        }
+        if(ballX > canvas.width){
+            ballSpeedX = - ballSpeedX;
+        }
+        if(ballY < 0){
+            ballSpeedY = - ballSpeedY;
+        }
+        if(ballY > canvas.height){
+            ballSpeedY = - ballSpeedY;
+        }
 }
 
 function draw(){
-    ballX = ballX + 5;
-    //console.log(ballX);
-    canvasCtx.fillStyle = 'black';
-	canvasCtx.fillRect(0,0,canvas.width,canvas.height);
-	canvasCtx.fillStyle = 'white';
-	canvasCtx.fillRect(0,100,10,200);
-	canvasCtx.fillStyle = 'red';
-	canvasCtx.fillRect(ballX,100,10,10);
+    //draws next line blacked out
+	colorRect(0,0,canvas.width,canvas.height, 'black');
+    
+    //Draws left player rectangle (Modes:)
+    // colorRect(0,210,10,200,'white');
+    colorRect(0,210,10,100,'white');
+    // colorRect(0,210,10,50,'white'); 
 
+    //draws Ball
+    colorCircle(ballX, ballY,10, 'white')
+    
+}
+
+function colorCircle(centerX, centerY, radius, drawColor){
+    canvasCtx.fillStyle = 'drawColor';
+    canvasCtx.beginPath();
+    canvasCtx.arc(centerX,centerY,radius,0,Math.PI*2,true);
+    canvasCtx.fill();
+}
+function colorRect(leftX,topY, width,height, drawColor){
+    canvasCtx.fillStyle = drawColor;
+	canvasCtx.fillRect(leftX,topY, width,height);
 }
 
 </script>
+    
 </body>
 </html>
