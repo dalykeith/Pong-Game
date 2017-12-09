@@ -30,6 +30,7 @@ and change paddleH 40
     ctx.font = "20px Georgia";
     ctx.fillText("Pong Game", 25, 40);
     ctx.fillText("User vs CPU", 650, 40);
+    
     </script>
 
 <canvas id="projectPong" width="800" height="600"></canvas>
@@ -50,6 +51,10 @@ var paddle1Y = 250; //left paddle
 var paddle2Y = 250; //right paddle
 const paddleH = 100; //set paddle height
 const paddleT = 10; //set paddle thickness
+
+//scores set to zero 
+var userScore = 0;
+var cpuScore = 0;
 
 // Adapted from: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
 // https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Desktop_with_mouse_and_keyboard
@@ -90,9 +95,10 @@ function callBF(){ //calls both functions
     movement();
 }
 function cpuMvmt(){
-    if (paddle2Y < ballY){
+    var paddle2YCenter = paddle2Y + (paddleH/2);
+    if (paddle2YCenter < ballY - 35){
         paddle2Y += 6;
-    } else{
+    } else if (paddle2YCenter > ballY + 35){ //fixes shaky right paddle
         paddle2Y -= 6;
     }
 }
@@ -102,17 +108,20 @@ function movement(){
         cpuMvmt();
         ballX += ballSpeedX;
         ballY += ballSpeedY; //ballY = ballY + ballSpeedY;
+
         if(ballX < 0){ 
             if(ballY > paddle1Y && ballY < paddle1Y+ paddleH){
                 ballSpeedX = -ballSpeedX;
             } else {
             ballReset(); //if ball goes into left side void, it will be center reset
+            cpuScore ++; //adds 1 point 
         }}
         if(ballX > canvas.width){
             if(ballY > paddle2Y && ballY < paddle2Y+ paddleH){
                 ballSpeedX = -ballSpeedX;
             } else {
             ballReset();
+            userScore ++; //adds 1 point
         }}
         if(ballY < 0){
             ballSpeedY = - ballSpeedY;
@@ -136,7 +145,12 @@ function draw(){
 
     //draws Ball
     colorCircle(ballX, ballY,10, 'white')
-    
+   //canvasCtx.fillText("Score stuff", 100, 100);
+
+    //score counter
+    canvasCtx.font = "30px Georgia";
+    canvasCtx.fillText(userScore, 650, 25);
+    canvasCtx.fillText(cpuScore, 750, 25);
 }
 
 function colorCircle(centerX, centerY, radius, drawColor){
