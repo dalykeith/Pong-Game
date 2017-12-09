@@ -89,10 +89,19 @@ function callBF(){ //calls both functions
     draw(); 
     movement();
 }
+function cpuMvmt(){
+    if (paddle2Y < ballY){
+        paddle2Y += 6;
+    } else{
+        paddle2Y -= 6;
+    }
+}
+
 
 function movement(){
-        ballX = ballX + ballSpeedX;
-        ballY = ballY + ballSpeedY;
+        cpuMvmt();
+        ballX += ballSpeedX;
+        ballY += ballSpeedY; //ballY = ballY + ballSpeedY;
         if(ballX < 0){ 
             if(ballY > paddle1Y && ballY < paddle1Y+ paddleH){
                 ballSpeedX = -ballSpeedX;
