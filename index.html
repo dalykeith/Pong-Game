@@ -9,19 +9,16 @@ Graphics Programming GMIT 2017
 <!-- Game Presets to change
 
 Beginer mode:
-Please change ballSpeed X & Y
-and change
-colorRect(0,210,10,200,'white');
+Please change ballSpeedX 5
+and change paddleH 250
 
 Intermediate mode:
-Please change ballSpeed X & Y
-and change
-colorRect(0,210,10,100,'white');
+Please change ballSpeedX 12
+and change paddleH 100
 
 Advanced Mode:
-Please change ballSpeed X & Y
-and change
-colorRect(0,210,10,50,'white');
+Please change ballSpeedX 25
+and change paddleH 40
 
 -->
 
@@ -47,10 +44,26 @@ var ballY = 50;
 // var ballSpeedX = 5;
 var ballSpeedX = 12;
 // var ballSpeedX = 25;
+var ballSpeedY = 7;
 
-// var ballSpeedXY = 1.5;
-var ballSpeedY = 4;
-// var ballSpeedY = 8;
+var paddle1Y = 250; //left paddle
+var paddle2Y = 250; //right paddle
+const paddleH = 100; //set paddle height
+const paddleT = 10; //set paddle thickness
+
+// Adapted from: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
+// https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Desktop_with_mouse_and_keyboard
+function calcMousePos(evt) {
+	var rect = canvas.getBoundingClientRect();
+	var root = document.documentElement;
+	var mouseX = evt.clientX - rect.left - root.scrollLeft;
+	var mouseY = evt.clientY - rect.top - root.scrollTop;
+	return {
+		x:mouseX,
+		y:mouseY
+	};
+}
+
 
 window.onload = function() {
 	// console.log("test");
@@ -59,7 +72,18 @@ window.onload = function() {
 
     var framesPerSecond = 30;
     setInterval(callBF, 1000/framesPerSecond);
+
+    canvas.addEventListener('mousemove',
+		function(evt) {
+			var mousePos = calcMousePos(evt);
+			paddle1Y = mousePos.y - (paddleH/2);
+		});
 	
+}
+function ballReset() {
+    ballSpeedX = - ballSpeedX; //this is added so it changes direction per each reset
+    ballX = canvas.width/2;
+    ballY = canvas.height/2;
 }
 function callBF(){ //calls both functions
     draw(); 
@@ -69,12 +93,18 @@ function callBF(){ //calls both functions
 function movement(){
         ballX = ballX + ballSpeedX;
         ballY = ballY + ballSpeedY;
-        if(ballX < 0){
-            ballSpeedX = - ballSpeedX;
-        }
+        if(ballX < 0){ 
+            if(ballY > paddle1Y && ballY < paddle1Y+ paddleH){
+                ballSpeedX = -ballSpeedX;
+            } else {
+            ballReset(); //if ball goes into left side void, it will be center reset
+        }}
         if(ballX > canvas.width){
-            ballSpeedX = - ballSpeedX;
-        }
+            if(ballY > paddle2Y && ballY < paddle2Y+ paddleH){
+                ballSpeedX = -ballSpeedX;
+            } else {
+            ballReset();
+        }}
         if(ballY < 0){
             ballSpeedY = - ballSpeedY;
         }
@@ -88,9 +118,12 @@ function draw(){
 	colorRect(0,0,canvas.width,canvas.height, 'black');
     
     //Draws left player rectangle (Modes:)
-    // colorRect(0,210,10,200,'white');
-    colorRect(0,210,10,100,'white');
-    // colorRect(0,210,10,50,'white'); 
+    // colorRect(0,paddle1Y,10,200,'white');
+    colorRect(0,paddle1Y,paddleT,paddleH,'white');
+    // colorRect(0,paddle1Y,10,50,'white'); 
+
+    //right side player CPU
+    colorRect(canvas.width -paddleT,paddle2Y,paddleT,paddleH,'white');
 
     //draws Ball
     colorCircle(ballX, ballY,10, 'white')
