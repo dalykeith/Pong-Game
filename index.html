@@ -45,7 +45,7 @@ var ballY = 50;
 // var ballSpeedX = 5;
 var ballSpeedX = 12;
 // var ballSpeedX = 25;
-var ballSpeedY = 7;
+var ballSpeedY = 5;
 
 var paddle1Y = 250; //left paddle
 var paddle2Y = 250; //right paddle
@@ -55,6 +55,9 @@ const paddleT = 10; //set paddle thickness
 //scores set to zero 
 var userScore = 0;
 var cpuScore = 0;
+
+const winScore = 1;
+var showingWinScreen = false;
 
 // Adapted from: https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
 // https://developer.mozilla.org/en-US/docs/Games/Techniques/Control_mechanisms/Desktop_with_mouse_and_keyboard
@@ -68,7 +71,13 @@ function calcMousePos(evt) {
 		y:mouseY
 	};
 }
-
+function handleMouseClick(evt){
+    if (showingWinScreen){ //if win screen is to be shown upon game completion show score reset
+        userScore = 0;
+        cpuScore = 0;
+        showingWinScreen = false;
+    }
+}
 
 window.onload = function() {
 	// console.log("test");
@@ -78,6 +87,8 @@ window.onload = function() {
     var framesPerSecond = 30;
     setInterval(callBF, 1000/framesPerSecond);
 
+    canvas.addEventListener('mousedown', handleMouseClick);
+
     canvas.addEventListener('mousemove',
 		function(evt) {
 			var mousePos = calcMousePos(evt);
@@ -86,9 +97,18 @@ window.onload = function() {
 	
 }
 function ballReset() {
-    ballSpeedX = - ballSpeedX; //this is added so it changes direction per each reset
-    ballX = canvas.width/2;
-    ballY = canvas.height/2;
+    if(userScore >= winScore ||
+		cpuScore >= winScore) {
+
+		// userScore = 0;
+		// cpuScore = 0;
+		showingWinScreen = true; //show scores as they are
+
+	}
+
+	ballSpeedX = -ballSpeedX;
+	ballX = canvas.width/2;
+	ballY = canvas.height/2;
 }
 function callBF(){ //calls both functions
     draw(); 
@@ -96,45 +116,82 @@ function callBF(){ //calls both functions
 }
 function cpuMvmt(){
     var paddle2YCenter = paddle2Y + (paddleH/2);
-    if (paddle2YCenter < ballY - 35){
-        paddle2Y += 6;
-    } else if (paddle2YCenter > ballY + 35){ //fixes shaky right paddle
-        paddle2Y -= 6;
-    }
+	if(paddle2YCenter < ballY - 35) {
+		paddle2Y = paddle2Y + 6;
+	} else if(paddle2YCenter > ballY + 35) {
+		paddle2Y = paddle2Y - 6;
+	}
 }
 
 
 function movement(){
+    if(showingWinScreen) {
+		return;
+	}
         cpuMvmt();
-        ballX += ballSpeedX;
-        ballY += ballSpeedY; //ballY = ballY + ballSpeedY;
+        ballX = ballX + ballSpeedX;
+	    ballY = ballY + ballSpeedY;
 
-        if(ballX < 0){ 
-            if(ballY > paddle1Y && ballY < paddle1Y+ paddleH){
-                ballSpeedX = -ballSpeedX;
-            } else {
-            ballReset(); //if ball goes into left side void, it will be center reset
-            cpuScore ++; //adds 1 point 
-        }}
-        if(ballX > canvas.width){
-            if(ballY > paddle2Y && ballY < paddle2Y+ paddleH){
-                ballSpeedX = -ballSpeedX;
-            } else {
-            ballReset();
-            userScore ++; //adds 1 point
-        }}
-        if(ballY < 0){
-            ballSpeedY = - ballSpeedY;
-        }
-        if(ballY > canvas.height){
-            ballSpeedY = - ballSpeedY;
-        }
+        if(ballX < 0) {
+		if(ballY > paddle1Y &&
+			ballY < paddle1Y+paddleH) {
+			ballSpeedX = -ballSpeedX;
+
+			var deltaY = ballY
+					-(paddle1Y+paddleH/2);
+			ballSpeedY = deltaY * 0.35;
+		} else {
+			cpuScore++; // add +1 pre resetting
+			ballReset();
+		}
+	}
+	if(ballX > canvas.width) {
+		if(ballY > paddle2Y &&
+			ballY < paddle2Y+paddleH) {
+			ballSpeedX = -ballSpeedX;
+
+			var deltaY = ballY
+					-(paddle2Y+paddleH/2);
+			ballSpeedY = deltaY * 0.35;
+		} else {
+			userScore++; // add +1 pre resetting
+			ballReset();	
+		}
+	}
+	if(ballY < 0) {
+		ballSpeedY = -ballSpeedY;
+	}
+	if(ballY > canvas.height) {
+		ballSpeedY = -ballSpeedY;
+	}
+}
+// draw line down the center with interval jumping 
+// 2px wide 20px tall
+function net(){ 
+    for(var i=0;i<canvas.height; i+=40){
+        colorRect(canvas.width/2-1,i,2,20,'white');
+    }
 }
 
 function draw(){
+
     //draws next line blacked out
-	colorRect(0,0,canvas.width,canvas.height, 'black');
-    
+	colorRect(0,0,canvas.width,canvas.height,'black');
+
+	if(showingWinScreen) {
+        canvasCtx.fillStyle = 'white';
+        if(userScore >= winScore) { 
+            canvasCtx.fillText("Player Won!", 325, 300);
+        } else if
+        (cpuScore >= winScore) {
+            canvasCtx.fillText("CPU Won!", 325, 300);
+        }
+        canvasCtx.fillText("Click to Restart", 300, 500);
+		return;
+	}
+    //net to be drawn
+    net();
+
     //Draws left player rectangle (Modes:)
     // colorRect(0,paddle1Y,10,200,'white');
     colorRect(0,paddle1Y,paddleT,paddleH,'white');
